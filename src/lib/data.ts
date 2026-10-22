@@ -60,7 +60,7 @@ export async function loadAll(supabase: SupabaseClient) {
     supabase
       .from("captions")
       .select("id, post_id, created_by, content, source, style, prompt, model, upvotes, downvotes, created_at")
-      .order("created_at", { ascending: true })
+      .order("id", { ascending: true })
       .limit(LIMIT),
     supabase
       .from("caption_votes")

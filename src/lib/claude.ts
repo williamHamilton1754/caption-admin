@@ -11,19 +11,24 @@ const CAPTIONS_SCHEMA = {
   additionalProperties: false,
 };
 
+// Admin-only app, so show the real cause instead of a generic message.
 function friendlyError(error: unknown) {
   console.error("Claude request failed", error);
 
-  if (error instanceof Anthropic.RateLimitError) {
-    return "Lots of people are captioning right now. Please try again in a minute.";
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return "ANTHROPIC_API_KEY isn't set for this deployment. Add it in Vercel and redeploy.";
   }
-  if (error instanceof Anthropic.AuthenticationError || error instanceof Anthropic.PermissionDeniedError) {
-    return "The caption AI is temporarily unavailable. Please try again later.";
+  if (error instanceof Anthropic.AuthenticationError) {
+    return "Claude rejected the API key (401). Paste a fresh key into ANTHROPIC_API_KEY and redeploy.";
   }
-  if (error instanceof Anthropic.BadRequestError) {
-    return "The AI couldn't read that photo. Try a different one.";
+  if (error instanceof Anthropic.APIError && error.status) {
+    return `Claude error ${error.status}: ${error.message}`;
   }
-  return "The caption AI is having trouble right now. Please try again.";
+  const detail = error instanceof Error ? error.message : String(error);
+  if (/ByteString|header|character/i.test(detail)) {
+    return "The API key contains characters that aren't allowed (was it copied from an image?). Paste a fresh key and redeploy.";
+  }
+  return `Couldn't reach Claude: ${detail}`;
 }
 
 export async function generateCaptionsWithClaude({
