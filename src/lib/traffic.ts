@@ -127,11 +127,18 @@ export function trafficStats(views: PageView[], visitors: Visitor[]) {
 
   const days = Array.from({ length: DAYS }, (_, i) => nycDay(new Date(Date.now() - (DAYS - 1 - i) * 86_400_000)));
   const viewsByDay = new Map<string, number>();
-  const visitorsByDay = new Map<string, Set<string>>();
   for (const v of views) {
     const d = nycDay(v.started_at);
     viewsByDay.set(d, (viewsByDay.get(d) ?? 0) + 1);
-    visitorsByDay.set(d, (visitorsByDay.get(d) ?? new Set()).add(v.user_id ?? v.visitor_id));
+  }
+  // Count people the same way as the Visitors list, so someone who signed in
+  // halfway through a visit is still one person.
+  const visitorsByDay = new Map<string, Set<string>>();
+  for (const person of visitors) {
+    for (const v of person.views) {
+      const d = nycDay(v.started_at);
+      visitorsByDay.set(d, (visitorsByDay.get(d) ?? new Set()).add(person.id));
+    }
   }
 
   const pages = new Map<string, { count: number; ms: number }>();
