@@ -37,6 +37,14 @@ export function ColumnChart({
   data: { day: string; count: number }[];
   unit: string;
 }) {
+  if (data.every((d) => d.count === 0)) {
+    return (
+      <p className="flex h-32 items-center justify-center rounded-lg border border-dashed border-black/10 text-sm text-zinc-500 dark:border-white/15 dark:text-zinc-400">
+        No {unit} in the last {data.length} days
+      </p>
+    );
+  }
+
   const width = 560;
   const height = 140;
   const top = 18;

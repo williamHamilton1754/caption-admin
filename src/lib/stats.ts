@@ -73,7 +73,7 @@ export function computeStats({
   const topVoters = [...votesByUser.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
-    .map(([id, count]) => ({ name: displayName(people.get(id)), count }));
+    .map(([id, count]) => ({ name: displayName(people.get(id)), email: people.get(id)?.email ?? undefined, count }));
 
   const humanScoreByUser = new Map<string, number>();
   for (const c of human) humanScoreByUser.set(c.created_by, (humanScoreByUser.get(c.created_by) ?? 0) + score(c));

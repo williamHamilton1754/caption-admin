@@ -73,7 +73,7 @@ export default async function DashboardPage() {
         </ChartCard>
 
         <ChartCard title="Most active voters" subtitle="Votes cast per person">
-          <BarList rows={s.topVoters.map((v) => ({ label: v.name, value: v.count }))} emptyText="No votes yet" />
+          <BarList rows={s.topVoters.map((v) => ({ label: v.email ? `${v.name} · ${v.email}` : v.name, value: v.count }))} emptyText="No votes yet" />
         </ChartCard>
       </div>
 
